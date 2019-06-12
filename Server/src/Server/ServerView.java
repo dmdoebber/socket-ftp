@@ -1,6 +1,8 @@
 package Server;
 
 
+import java.awt.Color;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
@@ -18,9 +20,14 @@ import java.util.logging.Logger;
  * @author danie
  */
 public class ServerView extends javax.swing.JFrame {
-
+    private Server server;
+    private boolean statusServer;
+    
+    
     public ServerView() {
         initComponents();
+        
+        SetStatusServer(statusServer = true);
         try {
             IP.setText(InetAddress.getLocalHost().getHostAddress());
         } catch (UnknownHostException ex) {
@@ -32,15 +39,44 @@ public class ServerView extends javax.swing.JFrame {
         return Integer.parseInt(jtfPorta.getText());
     }
     
-    public boolean Active(){
-        return alternar.isSelected();
-    }
-    
     public void addLog(String log)
     {
         LocalDateTime ldt =  LocalDateTime.now();
         String date = "[" + ldt.getHour() + ":" + ldt.getMinute() + ":" + ldt.getSecond() + "]  ";
         logs.append(date + log + "\n");
+    }
+    
+    private void SetStatusServer(boolean status)
+    {
+        if (status){
+            onoff.setBackground(Color.red);
+            onoff.setText("OFF");
+             try {
+                if (server != null)
+                    server.StopServer();
+            
+           
+                server = new Server(this);
+                server.start(); 
+            } catch (IOException ex) {
+                 System.out.println("Error (ON/OFF Server)" + ex);
+            }
+        }
+        else
+        {
+            try {
+                if (server != null)
+                    server.StopServer();
+            } catch (IOException ex) {
+                Logger.getLogger(ServerView.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            addLog("Servidor na porta " + getPorta() + " foi fechado!");
+            onoff.setBackground(Color.green);
+            onoff.setText("ON");
+        }
+        
+        statusServer = status;
     }
     
     @SuppressWarnings("unchecked")
@@ -53,7 +89,7 @@ public class ServerView extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jtfPorta = new javax.swing.JTextField();
         IP = new javax.swing.JTextField();
-        alternar = new javax.swing.JToggleButton();
+        onoff = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         logs = new javax.swing.JTextArea();
@@ -73,7 +109,13 @@ public class ServerView extends javax.swing.JFrame {
 
         IP.setEditable(false);
 
-        alternar.setText("ON/OFF");
+        onoff.setBackground(new java.awt.Color(0, 255, 0));
+        onoff.setText("On");
+        onoff.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                onoffActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -88,9 +130,9 @@ public class ServerView extends javax.swing.JFrame {
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jtfPorta, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(alternar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(onoff, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,8 +143,8 @@ public class ServerView extends javax.swing.JFrame {
                     .addComponent(IP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
                     .addComponent(jtfPorta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(alternar))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(onoff))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Logs"));
@@ -116,17 +158,11 @@ public class ServerView extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1)
-                .addContainerGap())
+            .addComponent(jScrollPane1)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -135,10 +171,10 @@ public class ServerView extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -156,8 +192,8 @@ public class ServerView extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -170,9 +206,12 @@ public class ServerView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void onoffActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onoffActionPerformed
+        SetStatusServer(!statusServer);        
+    }//GEN-LAST:event_onoffActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField IP;
-    private javax.swing.JToggleButton alternar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
@@ -181,5 +220,6 @@ public class ServerView extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField jtfPorta;
     private javax.swing.JTextArea logs;
+    private javax.swing.JButton onoff;
     // End of variables declaration//GEN-END:variables
 }

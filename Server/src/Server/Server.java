@@ -8,39 +8,40 @@ package Server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author daniel
  */
 public class Server extends Thread{
-    private final ServerSocket server;
+    private final ServerSocket serverSocket;
+    private final ServerView view;
     
-    ServerView view;
-    
-    public Server() throws IOException{
-        server = new ServerSocket(12345);
+    public Server(ServerView view) throws IOException{
+        this.view = view;
         
-        view = new ServerView();
-        view.setVisible(true);
+        serverSocket = new ServerSocket(view.getPorta());
+        view.addLog("Servidor iniciado na porta " + serverSocket.getLocalPort());
     }
     
     @Override
     public void run(){
-        while(true){
-            try {
-                Socket s = server.accept();
-                Connection c = new Connection(s);
+        try {
+             while(true){
+                Socket socket = serverSocket.accept();
+                Connection c = new Connection(socket, view);
                 c.start();
-
-            } catch (IOException ex) {
-                System.out.println("Erro!"+ex);
-            }
+             }
+        } catch (IOException ex) {
+            System.out.println("IOException (Server)"  + ex);
         }
     }
     
-    
-    
-    
+    public void StopServer() throws IOException{
+        serverSocket.close();
+        this.interrupt();
+    }
     
 }

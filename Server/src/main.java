@@ -1,4 +1,5 @@
 import Server.Server;
+import Server.ServerView;
 import java.io.IOException;
 
 /*
@@ -19,7 +20,6 @@ public class main {
      * @throws java.io.IOException
      */
     public static void main(String[] args) throws IOException {
-        Server s = new Server();
-        s.start();
+        new ServerView().setVisible(true);
     }
 }

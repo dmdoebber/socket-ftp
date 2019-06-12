@@ -12,8 +12,7 @@ import javax.swing.JFileChooser;
  * @author danie
  */
 public class ClientView extends javax.swing.JFrame {
-    JFileChooser filechooser;
-    private Client client;
+    private JFileChooser filechooser;
     private File file;
     
     public ClientView() 
@@ -24,34 +23,39 @@ public class ClientView extends javax.swing.JFrame {
     
     private void setAtribbutes()
     {
+        // setar atributos do slider de ruido
         noisePercent.setMinimum(0);
         noisePercent.setMaximum(10);
         
-        
+        // setar atributos do seletor de arquivos
         filechooser = new JFileChooser();
         filechooser.setDialogTitle("Escolha o arquivo");
         filechooser.setApproveButtonText("Selecionar");
         filechooser.setDialogType(JFileChooser.OPEN_DIALOG);
         filechooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         
-        try{
+        // setar o campo de ip do servidor
+        try{    
             IP.setText(InetAddress.getLocalHost().getHostAddress()); 
         }catch (UnknownHostException ex) { 
             System.out.println(ex); 
         }
     }
     
+    // setar limites da barra de progresso
     public void setLimitProgressBar(int min, int max)
-    {
+    {    
         progess.setMinimum(min);
         progess.setMaximum(max);
     }
     
+    // setar valor da barra de progresso
     public void setValueProgressBar(int value)
     {
         progess.setValue(value);
     }
     
+    // adicionar log na view
     public void addLog(String log)
     {
         LocalDateTime ldt =  LocalDateTime.now();
@@ -59,21 +63,25 @@ public class ClientView extends javax.swing.JFrame {
         logs.append(date + log + "\n");
     }
     
+    // pegar o valor da barra de progresso
     public int getNoisePercent()
     {
         return noisePercent.getValue();
     }
     
+    // pegar o valor da checkbox de inserir ruido nos dados
     public boolean sendWithNoise()
     {
         return noise.isSelected() == true;
     }
     
+    // pegar nome do arquivo
     public String getFileName()
     {
         return filename.getText() + fileextension.getText();
     }
     
+    // pegar arquivo para envio
     public File getFile()
     {
         if (file == null)
@@ -82,7 +90,8 @@ public class ClientView extends javax.swing.JFrame {
         return file;
     }
     
-    public File EscolherArquivo()
+    // seleciona arquivo a ser enviado
+    private File EscolherArquivo()
     {
         int resultado = filechooser.showOpenDialog(filechooser);
         if (resultado == JFileChooser.CANCEL_OPTION)
@@ -102,11 +111,13 @@ public class ClientView extends javax.swing.JFrame {
         return choosedFile;
     }
  
+    // pegar ip
     public String getIP()
     {
         return IP.getText();
     }
     
+    // pegar porta
     public int getPorta()
     {
         return Integer.parseInt(porta.getText());
@@ -357,15 +368,20 @@ public class ClientView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void pingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pingActionPerformed
+        // método de teste de ping para o servidor
+        
         long start = System.currentTimeMillis();
-        new Client(this, "PING").start();
+        //new Client(this, "PING").start();
         long end = System.currentTimeMillis();    
         
-        this.addLog("Ping in " + (end - start) + " ms");
+        this.addLog("Ping " + (end - start) + " ms");
     }//GEN-LAST:event_pingActionPerformed
 
     private void chosefileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chosefileActionPerformed
         file = EscolherArquivo();
+        
+        this.addLog("Arquivo selecionado: " + file.getName() + "[" +
+                String.format("%.2f", (file.length() /(1024.0f * 1024.0f))) + "]");
     }//GEN-LAST:event_chosefileActionPerformed
 
     private void sendFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sendFileActionPerformed

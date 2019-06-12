@@ -41,8 +41,12 @@ public class Frame{
     
     public byte[] getBytesWithNoise(int noisePercent)
     {
-        // ADICIONAR PARTE DE RUIDO EM RELAÇÃO A PORCENTAGEM
-        return getBytes();
+        byte[] bytes = getBytes();
+        
+        if(Math.random() * 100 < noisePercent)
+            bytes[(int)(28 + Math.random() * 990)]++;
+        
+        return bytes;
     }
     
     public static int generateChecksum(byte[] bytes)
@@ -51,7 +55,7 @@ public class Frame{
         int checksum = 0, i;
         
         // Soma feita a cada dois caracteres (reduz chance de erros)
-        for (i = 0; i < bytes.length - 2;  i+=2)
+        for (i = 0; i < bytes.length - 2;  i+= 2)
         {
             // Converte para hexadecimal para realizar a soma
             hex_value = Integer.toHexString((bytes[i] & 0xFF)) + Integer.toHexString(bytes[i+1] & 0xFF);

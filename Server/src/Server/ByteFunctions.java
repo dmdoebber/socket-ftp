@@ -12,7 +12,7 @@ import java.util.Arrays;
  *
  * @author danie
  */
-public class ByteFunctions {
+public class ByteFunctions{
     
     public static byte[] IntegerToByteArray(int i)
     {
