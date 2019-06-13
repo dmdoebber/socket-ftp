@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -70,7 +71,7 @@ public class Client extends Thread{
             
             int frames_enviados = 0;
             
-            while (!feedBuffer.IsEmpty())
+            while (!feedBuffer.IsEmpty() || !resend.isEmpty())
             {
                 // adiciona os frames que devem ser reenviados
                 frames.addAll(resend);
@@ -87,7 +88,7 @@ public class Client extends Thread{
                     byte[] dataOUT;
                     
                     // verifica se deve ser enviado com ruido ou não
-                    if (view.sendWithNoise())
+                    if (view.sendWithNoise() && !feedBuffer.IsEmpty())
                         dataOUT = frames.get(i).getBytesWithNoise(view.getNoisePercent());
                     else
                         dataOUT = frames.get(i).getBytes();
@@ -100,7 +101,6 @@ public class Client extends Thread{
                 // recebe a resposta com timeout
                 byte[] dataIN = GetResponse(input, 500, TimeUnit.MILLISECONDS);
                 
-                
                 resend.clear();
                 
                 // verifica a resposta do servidor
@@ -110,13 +110,16 @@ public class Client extends Thread{
                 
                 // se não adiciona os frames incorretos para serem reenviados
                 else
+                {
                     for(int i = 0; i < frames.size(); i++)
                         if (dataIN[i] == '0')    
                             resend.add(frames.get(i));
+                }
                 
                 frames.clear();
                 
                 frames_enviados -= resend.size();
+                
                 
                 view.setValueProgressBar(frames_enviados);
             }

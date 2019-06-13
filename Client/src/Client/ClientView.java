@@ -230,8 +230,8 @@ public class ClientView extends javax.swing.JFrame {
         percetnoise.setText("10%");
 
         noisePercent.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                noisePercentMouseReleased(evt);
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                noisePercentMouseClicked(evt);
             }
         });
 
@@ -388,10 +388,9 @@ public class ClientView extends javax.swing.JFrame {
         new Client(this, "SEND").start();
     }//GEN-LAST:event_sendFileActionPerformed
 
-    private void noisePercentMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_noisePercentMouseReleased
-        progess.setValue(noisePercent.getValue());
+    private void noisePercentMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_noisePercentMouseClicked
         percetnoise.setText(noisePercent.getValue()+"%");
-    }//GEN-LAST:event_noisePercentMouseReleased
+    }//GEN-LAST:event_noisePercentMouseClicked
    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField IP;
