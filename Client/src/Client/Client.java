@@ -37,7 +37,7 @@ public class Client extends Thread{
         
         if(mode.equals("SEND"))
         {
-            feedBuffer = new FeedBuffer(view.getFile());
+            feedBuffer = new FeedBuffer(view.getFile(), view);
             feedBuffer.start();
         }
     }

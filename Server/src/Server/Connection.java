@@ -11,8 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Arrays;
 
 /**
  *
@@ -39,7 +38,7 @@ public class Connection extends Thread{
             byte[] header = new byte[128];
             input.read(header, 0, header.length);
             
-            String mode = new String(ByteFunctions.subArray(header, 0, 4));       
+            String mode = new String(ByteFunctions.subArray(header, 0, 4));
             String filename  = new String(ByteFunctions.subArray(header, 4, 36)).replaceAll(""+(char)0, "");
             long size = ByteFunctions.ByteArrayToLong(ByteFunctions.subArray(header, 36, 44));
             int num_frames = ByteFunctions.ByteArrayToInteger(ByteFunctions.subArray(header, 44, 48));
@@ -52,7 +51,6 @@ public class Connection extends Thread{
             
             int success_frames = 0;
             int error_frames = 0;
-            
             
             while(success_frames < num_frames)
             {
@@ -67,6 +65,7 @@ public class Connection extends Thread{
                     {
                         if((frames[frame.num_frame] == null))
                         {
+                            System.out.println(frame);
                             frames[frame.num_frame] = frame;
                             success_frames++;
                         }
@@ -78,6 +77,7 @@ public class Connection extends Thread{
                         error_frames++;
                     }
                 }
+                System.out.println(Arrays.toString(dataOUT));
                 
                 output.write(dataOUT, 0, dataOUT.length);
                 output.flush();
@@ -111,7 +111,7 @@ public class Connection extends Thread{
             try (BufferedOutputStream fileWriter = new BufferedOutputStream(new FileOutputStream(file))) {
                 for (Frame frame : frames)
                 {
-                    fileWriter.write(frame.data, 0, frame.data.length);
+                    fileWriter.write(frame.data, 0, frame.lenght_data);
                     fileWriter.flush();
                 }
             }

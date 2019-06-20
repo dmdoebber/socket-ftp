@@ -17,21 +17,23 @@ public class Frame {
     String ip_origem; //  15 bytes  [4]
     int porta;        //   4 bytes [19]
     int checksum;     //   4 bytes [23]
-    byte[] data;      // 997 bytes [27]
+    int lenght_data;  //   4 bytes [27]
+    byte[] data;      // 993 bytes [31]
     
     public Frame(byte[] bytes)
     {
-        num_frame = ByteFunctions.ByteArrayToInteger(ByteFunctions.subArray(bytes, 0, 4));
-        ip_origem = new String(ByteFunctions.subArray(bytes, 4, 19));
-        porta     = ByteFunctions.ByteArrayToInteger(ByteFunctions.subArray(bytes, 19, 23));
-        checksum  = ByteFunctions.ByteArrayToInteger(ByteFunctions.subArray(bytes, 23, 27));
-        data      = ByteFunctions.subArray(bytes, 27, 1024);
+        num_frame   = ByteFunctions.ByteArrayToInteger(ByteFunctions.subArray(bytes, 0, 4));
+        ip_origem   = new String(ByteFunctions.subArray(bytes, 4, 19));
+        porta       = ByteFunctions.ByteArrayToInteger(ByteFunctions.subArray(bytes, 19, 23));
+        checksum    = ByteFunctions.ByteArrayToInteger(ByteFunctions.subArray(bytes, 23, 27));
+        lenght_data = ByteFunctions.ByteArrayToInteger(ByteFunctions.subArray(bytes, 27, 31));
+        data        = ByteFunctions.subArray(bytes, 31, 1024);
     }
     
     @Override
     public String toString()
     {
-        return "["+ip_origem+":"+porta+"]: {"+ Integer.toHexString(checksum)+"} "+new String(data);
+        return "["+ip_origem+":"+porta+"]: {"+ Integer.toHexString(checksum)+"} "+ lenght_data;
     }
     
     public boolean ValidateChecksum()

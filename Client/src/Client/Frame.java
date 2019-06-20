@@ -11,14 +11,16 @@ public class Frame{
     String ip_origem; //  15 bytes  [4]
     int porta;        //   4 bytes [19]
     int checksum;     //   4 bytes [23]
-    byte[] data;      // 997 bytes [27]
+    int lenght_data;  //   4 bytes [27]
+    byte[] data;      // 997 bytes [31]
     
-    public Frame(int num_frame, String ip_origem, int porta, byte[] data)
+    public Frame(int num_frame, String ip_origem, int porta, byte[] data, int lenght)
     {
         this.num_frame = num_frame;
         this.ip_origem = ip_origem;
         this.porta = porta;
         this.data = data;
+        this.lenght_data = lenght;
     }
     
     public byte[] getBytes()
@@ -29,12 +31,14 @@ public class Frame{
         byte[] ip_origem_b = ip_origem.getBytes();
         byte[] porta_b     = ByteFunctions.IntegerToByteArray(porta);
         byte[] checksum_b  = ByteFunctions.IntegerToByteArray(generateChecksum(data)); 
+        byte[] lenght_b    = ByteFunctions.IntegerToByteArray(lenght_data);
         
         System.arraycopy(num_frame_b, 0, bytes,  0, num_frame_b.length);
         System.arraycopy(ip_origem_b, 0, bytes,  4, ip_origem_b.length);
         System.arraycopy(porta_b,     0, bytes, 19, porta_b.length);
         System.arraycopy(checksum_b,  0, bytes, 23, checksum_b.length);
-        System.arraycopy(data,        0, bytes, 27, data.length);
+        System.arraycopy(lenght_b,    0, bytes, 27, lenght_b.length);
+        System.arraycopy(data,        0, bytes, 31, data.length);
         
         return bytes;
     }
@@ -44,7 +48,7 @@ public class Frame{
         byte[] bytes = getBytes();
         
         if(Math.random() * 100 < noisePercent)
-            bytes[(int)(28 + Math.random() * 990)]++;
+            bytes[(int)(32 + Math.random() * 990)]++;
         
         return bytes;
     }

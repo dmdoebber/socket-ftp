@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -20,35 +21,41 @@ import java.util.Queue;
 
 public class FeedBuffer extends Thread
 {
-    private final int FRAME_SIZE = 997;
+    private final int FRAME_SIZE = 993;
     private final int BLOCK_SIZE = 10;
 
     private final Queue<Frame> buffer;
     private final File file;
+    private final ClientView view;
 
-    public FeedBuffer(File file){
+    public FeedBuffer(File file, ClientView view){
         buffer = new LinkedList<>();
         this.file = file;
+        this.view = view;
     }
 
     @Override
     public void run(){
         try {
+            String IP = InetAddress.getLocalHost().getHostAddress();
             InputStream inputStream = new FileInputStream(file);
             int count_frames = 0;
+
             while (true) {
                 byte[] bytes = new byte[FRAME_SIZE * BLOCK_SIZE];
 
                 int lenght = inputStream.read(bytes);
-
+               
                 // End of file
                 if(lenght == -1)
                     break;
 
-                // FALTA PEGAR O IP, PORTA E DEFINIR UMA NUMERAÇÃO DO FRAME
+                int remaing = lenght;
+                
                 for(int i = 0; i < BLOCK_SIZE && i * FRAME_SIZE <= lenght; i++){
                     byte[] data = Arrays.copyOfRange(bytes, i * FRAME_SIZE, (i+1)* FRAME_SIZE);
-                    Enqueue(new Frame(count_frames++, "", 12345, data));
+                    Enqueue(new Frame(count_frames++, IP, view.getPorta(), data, Math.min(FRAME_SIZE, remaing)));
+                    remaing-= FRAME_SIZE;
                 }
             }
         } catch (IOException ex) {
